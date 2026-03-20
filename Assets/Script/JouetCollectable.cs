@@ -11,10 +11,10 @@ public class jouetCollectable : MonoBehaviour
 
     void Update()
     {
-        transform.Rotate(Vector3.up, rotationVitesse * Time.deltaTime);
+        transform.Rotate(Vector3.forward, rotationVitesse * Time.deltaTime);
     }
 
-    void OnTriggerEnter(Collider autre)
+    void OnTriggerEnter2D(Collider2D autre)
     {
         if (!autre.CompareTag("Player")) return;
 

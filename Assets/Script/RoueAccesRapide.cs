@@ -37,18 +37,9 @@ public class RoueAccesRapide : MonoBehaviour
     void Start()
     {
         panneauRoue.SetActive(false);
-    }
-
-    void OnEnable()
-    {
         GestionnairePouvoirs.Instance.SurCollecte.AddListener((_) => ReconstruireRoue());
     }
 
-    void OnDisable()
-    {
-        if (GestionnairePouvoirs.Instance != null)
-            GestionnairePouvoirs.Instance.SurCollecte.RemoveListener((_) => ReconstruireRoue());
-    }
 
     void Update()
     {
@@ -102,6 +93,8 @@ public class RoueAccesRapide : MonoBehaviour
 
     void ReconstruireRoue()
     {
+        Debug.Log("ReconstruireRoue appelé, nb pouvoirs : " + GestionnairePouvoirs.Instance.ObtenirPouvoirs().Count);
+
         foreach (var s in slotsSpawnes) Destroy(s.gameObject);
         slotsSpawnes.Clear();
 
