@@ -21,8 +21,6 @@ public class PlayerMovement2D : MonoBehaviour
 
     [SerializeField]
     private Animator animator;
-    [SerializeField]
-    private SpriteRenderer spriteRenderer;
 
     private Rigidbody2D rb;
     private float horizontalInput;
@@ -33,6 +31,7 @@ public class PlayerMovement2D : MonoBehaviour
     private bool dashRequested;
     private float dashTimer;
     private float cooldownTimer;
+    private float lastDirection = 1f;
 
     void Awake()
     {
@@ -46,6 +45,7 @@ public class PlayerMovement2D : MonoBehaviour
 
     void FixedUpdate()
     {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         JumpPhysic();
     }
 
@@ -90,6 +90,7 @@ public class PlayerMovement2D : MonoBehaviour
     void Move()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -98,27 +99,21 @@ public class PlayerMovement2D : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C) && cooldownTimer <= 0f && !isDashing)
             dashRequested = true;
 
-        // Tourne le sprite
+        
         if (horizontalInput > 0)
+        {
             transform.localScale = new Vector3(1, 1, 1);
+            lastDirection = 1f; 
+        }
         else if (horizontalInput < 0)
+        {
             transform.localScale = new Vector3(-1, 1, 1);
-
-        Flip(rb.linearVelocity.x);
+            lastDirection = -1f;
+        }
 
         float characterVelocity = Mathf.Abs(rb.linearVelocity.x);
-        animator.SetFloat("Speed", rb.linearVelocity.x);
+        animator.SetFloat("Speed", characterVelocity);
     }
 
-    void Flip(float _velocity)
-    {
-        if (_velocity > 0.1f)
-        {
-            spriteRenderer.flipX = false;
-        }
-        else if(_velocity < 0.1f)
-        {
-            spriteRenderer.flipX = true;
-        }
-    }
+    
 }
