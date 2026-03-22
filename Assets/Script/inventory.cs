@@ -43,4 +43,16 @@ public class inventory : MonoBehaviour
     }
 
 
+    public bool HasItemInSlot(int index)
+    {
+        if (index < 0 || index >= inventories.Length) return false;
+        return inventories[index] != null;
+    }
+
+    public Item GetItemInSlot(int index)
+    {
+        if (index < 0 || index >= inventories.Length) return null;
+        return inventories[index];
+    }
+
 }

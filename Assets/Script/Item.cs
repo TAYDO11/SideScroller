@@ -10,6 +10,10 @@ public class Item : MonoBehaviour
     [SerializeField] private int amount;
     [SerializeField] private bool isUsed;
 
+    [Header("Prefab pour la main")]
+    public GameObject heldPrefab; // glisse le prefab ici dans l'Inspector
+
+
     public virtual void AddItemToInventory()
     {
 

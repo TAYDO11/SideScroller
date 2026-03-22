@@ -1,11 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class HeldItemManager : MonoBehaviour
 {
-    [Header("Slots d'inventaire (assignés dans l'Inspector)")]
-    public GameObject[] itemPrefabs; // slot 0 = touche 1, slot 1 = touche 2, etc.
-
     [Header("Référence main")]
     public Transform handTransform;
 
@@ -15,8 +13,8 @@ public class HeldItemManager : MonoBehaviour
 
     void Update()
     {
-        // --- Clavier : touches 1, 2, 3... ---
-        for (int i = 0; i < itemPrefabs.Length; i++)
+        // Clavier : touches 1, 2, 3, 4
+        for (int i = 0; i < 4; i++)
         {
             if (Keyboard.current[Key.Digit1 + i].wasPressedThisFrame)
             {
@@ -25,40 +23,47 @@ public class HeldItemManager : MonoBehaviour
             }
         }
 
-        // --- Manette PS : L1 maintenu + X ---
+        // Manette PS : L1 + X = slot 0, L1 + carré = slot 1
         var gamepad = Gamepad.current;
         if (gamepad != null)
         {
             if (gamepad.leftShoulder.isPressed && gamepad.buttonSouth.wasPressedThisFrame)
-            {
-                SelectSlot(0); // L1 + X → slot 0 (adapte selon tes besoins)
-            }
-            // Exemple : L1 + carré → slot 1
+                SelectSlot(0);
             if (gamepad.leftShoulder.isPressed && gamepad.buttonWest.wasPressedThisFrame)
-            {
                 SelectSlot(1);
-            }
         }
     }
 
     public void SelectSlot(int index)
     {
-        if (index < 0 || index >= itemPrefabs.Length) return;
-        if (itemPrefabs[index] == null) return;
+        // Vérifie que l'item est dans l'inventaire
+        if (!inventory.instance.HasItemInSlot(index))
+        {
+            Debug.Log("Slot " + index + " vide.");
+            return;
+        }
 
-        // Même slot déjà équipé → déséquipe (toggle)
+        // Toggle
         if (currentSlot == index)
         {
             UnequipItem();
             return;
         }
 
-        EquipItem(itemPrefabs[index], index);
+        Item item = inventory.instance.GetItemInSlot(index);
+
+        // Vérifie qu'un prefab est assigné sur l'item
+        if (item.heldPrefab == null)
+        {
+            Debug.LogWarning("Pas de heldPrefab sur l'item " + index);
+            return;
+        }
+
+        EquipItem(item.heldPrefab, index);
     }
 
     void EquipItem(GameObject prefab, int slotIndex)
     {
-        // Retire l'item actuel
         if (currentHeldItem != null)
         {
             if (currentAura != null) currentAura.DisableAura();
@@ -71,7 +76,13 @@ public class HeldItemManager : MonoBehaviour
         currentHeldItem.transform.localPosition = Vector3.zero;
 
         currentAura = currentHeldItem.GetComponent<ItemAuraController>();
-        if (currentAura != null) currentAura.EnableAura();
+        if (currentAura != null) StartCoroutine(EnableAuraNextFrame(currentAura));
+    }
+
+    IEnumerator EnableAuraNextFrame(ItemAuraController aura)
+    {
+        yield return null;
+        aura.EnableAura();
     }
 
     public void UnequipItem()
@@ -82,5 +93,4 @@ public class HeldItemManager : MonoBehaviour
         currentAura = null;
         currentSlot = -1;
     }
-
 }
