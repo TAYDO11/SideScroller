@@ -21,6 +21,15 @@ public class HeldItemManager : MonoBehaviour
                 SelectSlot(i);
                 return;
             }
+
+            if(currentHeldItem != null)
+            {
+                SpriteRenderer playerSprite = GetComponent<SpriteRenderer>();
+                SpriteRenderer itemSprite = currentHeldItem.GetComponent<SpriteRenderer>();
+                if (playerSprite != null && itemSprite != null)
+                    itemSprite.flipX = playerSprite.flipX;
+            }
+
         }
 
         // Manette PS : L1 + X = slot 0, L1 + carré = slot 1
